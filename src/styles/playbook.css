@@ -176,7 +176,10 @@
   @-webkit-keyframes hero-scene-narrow {
     0%,
     5% {
-      clip-path: inset(0% 0% 0% 0% round 0px);
+      clip-path: inset(
+        var(--hero-img-inset-y, 0%) var(--hero-img-inset-x, 0%)
+          var(--hero-img-inset-y, 0%) var(--hero-img-inset-x, 0%) round 16px
+      );
       opacity: 1;
     }
     46%,
@@ -199,7 +202,10 @@
   @keyframes hero-scene-narrow {
     0%,
     5% {
-      clip-path: inset(0% 0% 0% 0% round 0px);
+      clip-path: inset(
+        var(--hero-img-inset-y, 0%) var(--hero-img-inset-x, 0%)
+          var(--hero-img-inset-y, 0%) var(--hero-img-inset-x, 0%) round 24px
+      );
       opacity: 1;
     }
     46%,
@@ -333,9 +339,15 @@
        object-position: 50% 50%;
     z-index: 4;
     pointer-events: none;
-    /* Start with the whole landscape visible; the curtain narrows via
-       clip-path on scroll. */
-    clip-path: inset(0% 0% 0% 0% round 0px);
+    /* Start with the whole landscape visible, clipped to the picture's own
+       boundary with softly rounded corners. The img is letterboxed inside its
+       --hero-fit box (object-fit: contain), so the element's corners sit in
+       the empty letterbox - the rounding must inset to the visible image rect
+       (insets computed in usePlaybook). The curtain narrows from here. */
+    clip-path: inset(
+      var(--hero-img-inset-y, 0%) var(--hero-img-inset-x, 0%)
+        var(--hero-img-inset-y, 0%) var(--hero-img-inset-x, 0%) round 16px
+    );
     will-change: clip-path, opacity;
   }
 

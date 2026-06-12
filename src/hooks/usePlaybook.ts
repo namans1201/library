@@ -83,6 +83,19 @@ export function usePlaybook() {
       const letterboxX = (vw - sceneW) / 2
       const letterboxY = (vh - sceneH) / 2
 
+      // The picture is letterboxed inside the --hero-fit box (object-fit:
+      // contain), so expose the letterbox as inset fractions of the element
+      // box - the clip-path rounds the visible image's own boundary, not the
+      // element's corners sitting in the empty letterbox.
+      root.style.setProperty(
+        '--hero-img-inset-x',
+        `${(((sceneBoxWidth - sceneW) / 2 / sceneBoxWidth) * 100).toFixed(3)}%`
+      )
+      root.style.setProperty(
+        '--hero-img-inset-y',
+        `${(((sceneBoxHeight - sceneH) / 2 / sceneBoxHeight) * 100).toFixed(3)}%`
+      )
+
       // Figure rect on screen (figure canvas -> scene canvas -> screen), then
       // its centre offset from the viewport centre (which is the card centre).
       const figVisW = FIG.w * FIG2SCENE.scale * sceneScale
@@ -149,8 +162,19 @@ export function usePlaybook() {
         // Narrow the landscape scene horizontally into the avatar card frame,
         // then cross-fade to the card (mirrors the CSS hero-scene-narrow
         // keyframes for browsers without scroll-driven animation support).
-        .to(
+        // Both endpoints are written out explicitly in the same 5-number form
+        // so GSAP interpolates them component-wise (the computed style of the
+        // var-based start clip may serialize collapsed and fail to match).
+        .fromTo(
           '.hero-scene',
+          {
+            clipPath: () => {
+              const s = getComputedStyle(document.documentElement)
+              const x = s.getPropertyValue('--hero-img-inset-x').trim() || '0%'
+              const y = s.getPropertyValue('--hero-img-inset-y').trim() || '0%'
+              return `inset(${y} ${x} ${y} ${x} round 16px)`
+            },
+          },
           {
             clipPath: () => {
               const s = getComputedStyle(document.documentElement)
