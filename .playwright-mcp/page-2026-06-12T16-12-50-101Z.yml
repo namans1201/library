@@ -1,0 +1,71 @@
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - banner [ref=e4]:
+      - heading "Projects Library" [level=1] [ref=e5]:
+        - text: Projects
+        - text: Library
+    - main [ref=e6]:
+      - generic [ref=e9]:
+        - generic:
+          - link "stocks on GitHub" [ref=e10] [cursor=pointer]:
+            - /url: https://github.com/Namans12/stocks
+            - img "stocks" [ref=e11]
+          - link "to-do-better on GitHub" [ref=e12] [cursor=pointer]:
+            - /url: https://github.com/Namans12/to-do-better
+            - img "to-do-better" [ref=e13]
+          - link "llm on GitHub" [ref=e14] [cursor=pointer]:
+            - /url: https://github.com/Namans12/llm
+            - img "llm" [ref=e15]
+          - link "projects-web on GitHub" [ref=e16] [cursor=pointer]:
+            - /url: https://github.com/Namans12/projects-web
+            - img "projects-web" [ref=e17]
+          - link "water-logger on GitHub" [ref=e18] [cursor=pointer]:
+            - /url: https://github.com/Namans12/water-logger
+            - img "water-logger" [ref=e19]
+          - link "scraper-downloader-raretoons on GitHub" [ref=e20] [cursor=pointer]:
+            - /url: https://github.com/Namans12/scraper-downloader-raretoons
+            - img "scraper-downloader-raretoons" [ref=e21]
+        - generic:
+          - link "musicpipeline--best on GitHub" [ref=e22] [cursor=pointer]:
+            - /url: https://github.com/Namans12/musicpipeline--best
+            - img "musicpipeline--best" [ref=e23]
+          - link "videolyzer-dashboard on GitHub" [ref=e24] [cursor=pointer]:
+            - /url: https://github.com/Namans12/videolyzer-dashboard
+            - img "videolyzer-dashboard" [ref=e25]
+          - link "wizlight on GitHub" [ref=e26] [cursor=pointer]:
+            - /url: https://github.com/Namans12/wizlight
+            - img "wizlight" [ref=e27]
+          - link "clip-clap on GitHub" [ref=e28] [cursor=pointer]:
+            - /url: https://github.com/namans1201/clip-clap
+            - img "clip-clap" [ref=e29]
+          - link "Clinic-App on GitHub" [ref=e30] [cursor=pointer]:
+            - /url: https://github.com/Namans12/Clinic-App
+            - img "Clinic-App" [ref=e31]
+          - link "duplicate-app-final on GitHub" [ref=e32] [cursor=pointer]:
+            - /url: https://github.com/Namans12/duplicate-app-final
+            - img "duplicate-app-final" [ref=e33]
+        - generic:
+          - link "dual_display on GitHub" [ref=e34] [cursor=pointer]:
+            - /url: https://github.com/Namans12/dual_display
+            - img "dual_display" [ref=e35]
+          - link "watchlist on GitHub" [ref=e36] [cursor=pointer]:
+            - /url: https://github.com/Namans12/watchlist
+            - img "watchlist" [ref=e37]
+        - generic [ref=e38]:
+          - generic:
+            - generic:
+              - generic:
+                - img "Naman Shrimal working on a laptop"
+      - heading "Thank you for visiting!" [level=2] [ref=e40]
+  - contentinfo [ref=e41]:
+    - paragraph [ref=e42]: Naman Shrimal
+    - navigation "Social links" [ref=e43]:
+      - link "GitHub" [ref=e44] [cursor=pointer]:
+        - /url: https://github.com/Namans12
+        - img [ref=e45]
+      - link "LinkedIn" [ref=e47] [cursor=pointer]:
+        - /url: https://linkedin.com/in/naman-shrimal12/
+        - img [ref=e48]
+      - link "Email" [ref=e50] [cursor=pointer]:
+        - /url: mailto:Namanshrimal12@gmail.com
+        - img [ref=e51]
