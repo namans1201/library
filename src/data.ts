@@ -86,11 +86,11 @@ export const layers: Project[][] = [
   ],
 ]
 
-// The hero is the transparent avatar cutout sitting on a gray card that matches
-// the other project cards. The whole card scales down from a large hero size
-// into its grid cell as you scroll, and the avatar is sized to pop out past the
-// card's top edge. (Using one image — not a scene→cutout cross-fade — keeps the
-// avatar perfectly crisp with no ghosting.)
+// The settled card image: the avatar + laptop cut out on a transparent
+// background. Once the hero card has shrunk into its grid cell, the
+// scroll-synced figure hands off to this cut-out, anchored to the card's
+// bottom edge and sized to pop out past the card's edges with the full image
+// visible — never cropped.
 export const avatarCutout = '/avatar-cutout.png'
 
 // The full landing hero scene: the same avatar at his desk, surrounded by the
@@ -99,10 +99,12 @@ export const avatarCutout = '/avatar-cutout.png'
 // locked in place - handing off to the cutout card as it shrinks into the grid.
 export const heroScene = '/hero-scene.png'
 
-// The avatar with its background removed, at the exact same framing as the
-// hero scene (same source render, same pixel positions). Because it is
-// pixel-aligned with heroScene, fading the scene out over this figure reads as
-// the desk dissolving around a stationary avatar - no ghosting, no jump.
+// The avatar with its background removed, from the same artwork as the hero
+// scene but on a different canvas. usePlaybook maps this canvas onto the
+// scene's (FIG2SCENE, template-matched against the actual pixels), so the
+// figure's outline sits exactly over the scene's avatar and laptop - fading
+// the scene out over it reads as the desk dissolving around a stationary
+// avatar, no ghosting, no jump.
 export const avatarFigure = '/avatar-figure.png'
 
 // Both GitHub accounts, shown on the back of the hero flip card.

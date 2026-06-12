@@ -25,12 +25,15 @@ export function usePlaybook() {
 
       const styles = getComputedStyle(document.documentElement)
       const gutter = Number.parseFloat(styles.getPropertyValue('--gutter')) || 32
+      // The whole hero (scene box + card hero scale) shrinks by this factor so
+      // the landing image fits the page with a margin instead of going edge to
+      // edge. Scaling both by the same factor keeps the scene→card morph aligned.
+      const fit = Number.parseFloat(styles.getPropertyValue('--hero-fit')) || 1
       const availableWidth = Math.max(1, window.innerWidth - gutter * 2)
       const availableHeight = Math.max(1, window.innerHeight - gutter * 2)
-      const startScale = Math.max(
-        1,
-        Math.min(availableWidth / width, availableHeight / height)
-      )
+      const startScale =
+        fit *
+        Math.max(1, Math.min(availableWidth / width, availableHeight / height))
 
       scaler.style.setProperty('--hero-start-scale', String(startScale))
 
@@ -41,49 +44,52 @@ export function usePlaybook() {
       // viewport size, then expose them to the keyframes.
       const heroCardWidth = width * startScale
       const heroCardHeight = height * startScale
+      // The scene element's box is --hero-fit of the viewport (see CSS), so the
+      // clip insets are expressed as a fraction of that box, not the viewport.
+      const sceneBoxWidth = window.innerWidth * fit
+      const sceneBoxHeight = window.innerHeight * fit
       const clipX = Math.max(
         0,
-        ((window.innerWidth - heroCardWidth) / 2 / window.innerWidth) * 100
+        ((sceneBoxWidth - heroCardWidth) / 2 / sceneBoxWidth) * 100
       )
       const clipY = Math.max(
         0,
-        ((window.innerHeight - heroCardHeight) / 2 / window.innerHeight) * 100
+        ((sceneBoxHeight - heroCardHeight) / 2 / sceneBoxHeight) * 100
       )
       const root = document.documentElement
       root.style.setProperty('--hero-clip-x', `${clipX.toFixed(3)}%`)
       root.style.setProperty('--hero-clip-y', `${clipY.toFixed(3)}%`)
 
-      // Align the center cut-out avatar (a different render) onto the avatar in
-      // the hero scene using their measured face landmarks, so that at the
-      // card's hero scale the cut-out's face lands exactly on the scene's face
-      // (same position and size). The card then scales this figure straight
-      // down into its grid cell, so the alignment holds through the whole
-      // scroll. Landmarks are fractions of each source image, measured offline.
-      const HERO = { w: 1672, h: 941, faceCx: 0.459, faceCy: 0.3539, faceW: 0.1591 }
-      const CUT = { w: 1536, h: 1024, faceCx: 0.4642, faceCy: 0.3687, faceW: 0.1986 }
-      const cutAspect = CUT.w / CUT.h
+      // Align the transparent avatar figure (a different render canvas) onto
+      // the avatar in the hero scene. FIG2SCENE maps avatar-figure.png canvas
+      // pixels onto hero-scene.png canvas pixels (scenePx = offset + scale *
+      // figurePx); it was measured by template-matching the two renders'
+      // actual pixels, so the figure's outline sits exactly over the scene's
+      // avatar and laptop during the cross-fade. The card then scales the
+      // figure straight down into its grid cell, so the alignment holds
+      // through the whole scroll.
+      const HERO = { w: 1672, h: 941 }
+      const FIG = { w: 1536, h: 1024 }
+      const FIG2SCENE = { scale: 0.841, ox: 170.7, oy: 16.8 }
 
       const vw = window.innerWidth
       const vh = window.innerHeight
-      // The scene is object-fit: contain in the viewport.
-      const sceneScale = Math.min(vw / HERO.w, vh / HERO.h)
+      // The scene is object-fit: contain inside the --hero-fit box, which is
+      // centered in the viewport. So it fits to the box, but its letterbox
+      // offsets are still measured from the viewport edges (box is centered).
+      const sceneScale = Math.min(sceneBoxWidth / HERO.w, sceneBoxHeight / HERO.h)
       const sceneW = HERO.w * sceneScale
       const sceneH = HERO.h * sceneScale
       const letterboxX = (vw - sceneW) / 2
       const letterboxY = (vh - sceneH) / 2
 
-      // Hero face on screen.
-      const heroFaceX = letterboxX + HERO.faceCx * sceneW
-      const heroFaceY = letterboxY + HERO.faceCy * sceneH
-      const heroFaceW = HERO.faceW * sceneW
-
-      // Size the cut-out so its face width matches the hero's face width.
-      const figVisW = heroFaceW / CUT.faceW
-      const figVisH = figVisW / cutAspect
-      // Place the cut-out's face on the hero's face, then derive the figure's
-      // centre offset from the viewport centre (which is the card centre).
-      const figCenterX = heroFaceX - CUT.faceCx * figVisW + figVisW / 2
-      const figCenterY = heroFaceY - CUT.faceCy * figVisH + figVisH / 2
+      // Figure rect on screen (figure canvas -> scene canvas -> screen), then
+      // its centre offset from the viewport centre (which is the card centre).
+      const figVisW = FIG.w * FIG2SCENE.scale * sceneScale
+      const figCenterX =
+        letterboxX + (FIG2SCENE.ox + (FIG.w / 2) * FIG2SCENE.scale) * sceneScale
+      const figCenterY =
+        letterboxY + (FIG2SCENE.oy + (FIG.h / 2) * FIG2SCENE.scale) * sceneScale
       const dxVisual = figCenterX - vw / 2
       const dyVisual = figCenterY - vh / 2
 
