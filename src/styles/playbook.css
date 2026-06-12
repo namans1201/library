@@ -461,8 +461,9 @@
   .card-cutout {
     position: absolute;
     left: 50%;
-    bottom: 3%;
-    width: 112%;
+    /* Laptop base sits exactly on the card's bottom border. */
+    bottom: -2%;
+    width: 130%;
     height: auto;
     /* Opt out of the global `.grid img` cover/4:5 rule - the cut-out keeps
        its natural aspect ratio. */
@@ -628,6 +629,11 @@
   }
 
   .grid img {
+    /* Block, not inline: an inline image leaves a text-descender gap under
+       its baseline, making each cell taller than the image itself. The
+       scaler stretches to the full row height, so that gap showed up as the
+       center card sticking out past its neighbours' bottom edges. */
+    display: block;
     width: 100%;
     aspect-ratio: 4 / 5;
     -o-object-fit: cover;
