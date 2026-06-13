@@ -1,4 +1,4 @@
-@import url('https://unpkg.com/normalize.css') layer(normalize);
+@import 'normalize.css' layer(normalize);
 
 @layer normalize, base, demo, grid, setup, scroll;
 
@@ -43,48 +43,6 @@
       0.9735 81.21%,
       0.9865 85%,
       0.9949 89.15%,
-      1 100%
-    );
-    --power-3-out: linear(
-      0 0%,
-      0.0029 13.8%,
-      0.0184 21.9%,
-      0.0339 25.51%,
-      0.0551 28.81%,
-      0.0827 31.88%,
-      0.1168 34.76%,
-      0.1962 39.57%,
-      0.3005 44.02%,
-      0.4084 47.53%,
-      0.6242 53.45%,
-      0.7493 57.93%,
-      0.8495 62.97%,
-      0.8888 65.67%,
-      0.9213 68.51%,
-      0.9629 73.9%,
-      0.9876 80.16%,
-      0.998 87.5%,
-      1 100%
-    );
-    --power-4-out: linear(
-      0 0%,
-      0.0012 14.95%,
-      0.0089 22.36%,
-      0.0297 28.43%,
-      0.0668 33.43%,
-      0.0979 36.08%,
-      0.1363 38.55%,
-      0.2373 43.07%,
-      0.3675 47.01%,
-      0.5984 52.15%,
-      0.7121 55.23%,
-      0.8192 59.21%,
-      0.898 63.62%,
-      0.9297 66.23%,
-      0.9546 69.06%,
-      0.9733 72.17%,
-      0.9864 75.67%,
-      0.9982 83.73%,
       1 100%
     );
     --sine: linear(
@@ -266,17 +224,6 @@
             animation-timeline: --runner, --runner;
             animation-timing-function: var(--sine), var(--power-1-out);
             animation-range: entry 100% exit 0%;
-          }
-          &[data-stagger='timing'] .grid .layer {
-            &:nth-of-type(1) {
-              animation-timing-function: var(--sine), var(--power-1-out);
-            }
-            &:nth-of-type(2) {
-              animation-timing-function: var(--sine), var(--power-3-out);
-            }
-            &:nth-of-type(3) {
-              animation-timing-function: var(--sine), var(--power-4-out);
-            }
           }
           &[data-stagger='range'] .grid .layer {
             &:nth-of-type(1) {
@@ -609,6 +556,7 @@
   }
   body {
     background: canvasText;
+    display: block;
   }
   h1 {
     --font-level: 8;
@@ -625,9 +573,6 @@
     max-width: calc(100% - (2 * var(--gutter)));
     padding-left: clamp(var(--gutter), 4vw, 48px);
     text-align: left;
-  }
-  body {
-    display: block;
   }
 
   main,
@@ -794,17 +739,5 @@
     top: 0;
     transform-style: flat;
     pointer-events: none;
-  }
-
-  .sr-only {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border-width: 0;
   }
 }

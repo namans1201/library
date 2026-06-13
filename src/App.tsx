@@ -23,21 +23,28 @@ export default function App() {
               <img
                 className="hero-scene"
                 src={heroScene}
-                alt="Naman Shrimal at his desk, working on a laptop"
+                alt=""
                 aria-hidden="true"
+                decoding="async"
+                fetchPriority="high"
               />
               <div className="grid">
                 {layers.map((projects, layerIndex) => (
                   <div className="layer" key={layerIndex}>
-                    {projects.map((project, imgIndex) => (
-                      <div key={imgIndex}>
+                    {projects.map((project) => (
+                      <div key={project.href}>
                         <a
                           href={project.href}
                           target="_blank"
                           rel="noreferrer noopener"
                           aria-label={`${project.name} on GitHub`}
                         >
-                          <img src={project.src} alt={project.name} />
+                          <img
+                          src={project.src}
+                          alt={project.name}
+                          loading="lazy"
+                          decoding="async"
+                        />
                         </a>
                       </div>
                     ))}
@@ -53,12 +60,15 @@ export default function App() {
                             src={avatarFigure}
                             alt=""
                             aria-hidden="true"
+                            decoding="async"
                           />
                         </div>
                         <img
                           className="card-cutout"
                           src={avatarCutout}
                           alt="Naman Shrimal working on a laptop"
+                          decoding="async"
+                          fetchPriority="high"
                         />
                       </div>
                       <div className="flip-face flip-back">

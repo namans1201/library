@@ -119,8 +119,9 @@ export function usePlaybook() {
     updateHeroScale()
     onScroll()
     const cutoutImg = scaler.querySelector<HTMLImageElement>('.card-cutout')
-    if (cutoutImg && !cutoutImg.complete) {
-      cutoutImg.addEventListener('load', updateHeroScale, { once: true })
+    const cutoutNeedsLoad = Boolean(cutoutImg && !cutoutImg.complete)
+    if (cutoutImg && cutoutNeedsLoad) {
+      cutoutImg.addEventListener('load', updateHeroScale)
     }
     window.addEventListener('scroll', onScroll, { passive: true })
     window.addEventListener('resize', updateHeroScale)
@@ -128,7 +129,11 @@ export function usePlaybook() {
 
     let cleanupGsap: (() => void) | undefined
 
-    if (!hasScrollSupport) {
+    const prefersReducedMotion = window.matchMedia(
+      '(prefers-reduced-motion: reduce)'
+    ).matches
+
+    if (!hasScrollSupport && !prefersReducedMotion) {
       gsap.registerPlugin(ScrollTrigger)
 
       const scalerTl = gsap
@@ -203,6 +208,9 @@ export function usePlaybook() {
     }
 
     return () => {
+      if (cutoutImg && cutoutNeedsLoad) {
+        cutoutImg.removeEventListener('load', updateHeroScale)
+      }
       window.removeEventListener('scroll', onScroll)
       window.removeEventListener('resize', updateHeroScale)
       window.removeEventListener('resize', onScroll)
