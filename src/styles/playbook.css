@@ -1,9 +1,11 @@
-@import url('https://unpkg.com/normalize.css') layer(normalize);
+@import 'normalize.css' layer(normalize);
 
 @layer normalize, base, demo, grid, setup, scroll;
 
 @layer scroll {
   :root {
+    --hero-fit: 0.9;
+    --cutout-pop: 1.3;
     --power-1-out: linear(
       0 0%,
       0.0027 3.64%,
@@ -43,48 +45,6 @@
       0.9949 89.15%,
       1 100%
     );
-    --power-3-out: linear(
-      0 0%,
-      0.0029 13.8%,
-      0.0184 21.9%,
-      0.0339 25.51%,
-      0.0551 28.81%,
-      0.0827 31.88%,
-      0.1168 34.76%,
-      0.1962 39.57%,
-      0.3005 44.02%,
-      0.4084 47.53%,
-      0.6242 53.45%,
-      0.7493 57.93%,
-      0.8495 62.97%,
-      0.8888 65.67%,
-      0.9213 68.51%,
-      0.9629 73.9%,
-      0.9876 80.16%,
-      0.998 87.5%,
-      1 100%
-    );
-    --power-4-out: linear(
-      0 0%,
-      0.0012 14.95%,
-      0.0089 22.36%,
-      0.0297 28.43%,
-      0.0668 33.43%,
-      0.0979 36.08%,
-      0.1363 38.55%,
-      0.2373 43.07%,
-      0.3675 47.01%,
-      0.5984 52.15%,
-      0.7121 55.23%,
-      0.8192 59.21%,
-      0.898 63.62%,
-      0.9297 66.23%,
-      0.9546 69.06%,
-      0.9733 72.17%,
-      0.9864 75.67%,
-      0.9982 83.73%,
-      1 100%
-    );
     --sine: linear(
       0 0%,
       0.2861 18.47%,
@@ -100,34 +60,21 @@
       1 100%
     );
   }
-  @-webkit-keyframes fade {
-    0%,
-    64% {
-      opacity: 0;
-    }
-  }
+
   @keyframes fade {
     0%,
     64% {
       opacity: 0;
     }
   }
-  @-webkit-keyframes reveal {
-    0%,
-    30% {
-      scale: 0;
-    }
-  }
+
   @keyframes reveal {
     0%,
     30% {
       scale: 0;
     }
   }
-  /* The hero card starts scaled up to fill the viewport, then shrinks down to
-     its grid cell. It completes the shrink by 56% of the scroll range and then
-     holds at scale 1, so the card is exactly cell-sized — and aligned with the
-     other cards — for the whole settled portion of the scroll. */
+
   @keyframes card-shrink {
     0%,
     60% {
@@ -138,19 +85,7 @@
       scale: 1;
     }
   }
-  /* The card stays invisible while the landscape scene is still wide, then
-     fades in to take over exactly as the scene reaches the card frame and
-     fades out - a clean, aligned hand-off with no double image. */
-  @-webkit-keyframes card-fade {
-    0%,
-    42% {
-      opacity: 0;
-    }
-    56%,
-    100% {
-      opacity: 1;
-    }
-  }
+
   @keyframes card-fade {
     0%,
     42% {
@@ -161,39 +96,14 @@
       opacity: 1;
     }
   }
-  /* The landscape scene fills the viewport on load (whole image visible), then
-     the visible window narrows horizontally from both edges - clip insets
-     growing left and right - until it matches the avatar card at its hero
-     scale. The window then holds and cross-fades to the card underneath, which
-     carries on shrinking into its grid cell. The narrowed insets are computed
-     per-viewport in usePlaybook so the curtain closes exactly onto the card. */
-  @-webkit-keyframes hero-scene-narrow {
-    0%,
-    5% {
-      clip-path: inset(0% 0% 0% 0% round 0px);
-      opacity: 1;
-    }
-    46%,
-    52% {
-      clip-path: inset(
-        var(--hero-clip-y, 5%) var(--hero-clip-x, 27%) var(--hero-clip-y, 5%)
-          var(--hero-clip-x, 27%) round 16px
-      );
-      opacity: 1;
-    }
-    62%,
-    100% {
-      clip-path: inset(
-        var(--hero-clip-y, 5%) var(--hero-clip-x, 27%) var(--hero-clip-y, 5%)
-          var(--hero-clip-x, 27%) round 16px
-      );
-      opacity: 0;
-    }
-  }
+
   @keyframes hero-scene-narrow {
     0%,
     5% {
-      clip-path: inset(0% 0% 0% 0% round 0px);
+      clip-path: inset(
+        var(--hero-img-inset-y, 0%) var(--hero-img-inset-x, 0%)
+          var(--hero-img-inset-y, 0%) var(--hero-img-inset-x, 0%) round 24px
+      );
       opacity: 1;
     }
     46%,
@@ -213,10 +123,54 @@
       opacity: 0;
     }
   }
+
+  @keyframes hero-figure-handoff {
+    0%,
+    86% {
+      opacity: 1;
+    }
+    87%,
+    100% {
+      opacity: 0;
+    }
+  }
+
+  @keyframes hero-cutout-fade {
+    0%,
+    86% {
+      opacity: 0;
+    }
+    87%,
+    100% {
+      opacity: 1;
+    }
+  }
+
+  @keyframes hero-cutout-emerge {
+    0%,
+    87% {
+      scale: var(--cutout-swap-scale, 0.6);
+      translate: calc(-50% + var(--cutout-aligned-dx, 0px))
+        calc(-50% + var(--cutout-aligned-dy, 0px));
+      filter: drop-shadow(0 3px 7px rgb(0 0 0 / 0));
+    }
+    100% {
+      scale: 1;
+      translate: -50% calc(-50% + var(--cutout-popped-dy, 0px));
+      filter: drop-shadow(0 8px 8px rgb(0 0 0 / 0.22));
+    }
+  }
+
   @media (prefers-reduced-motion: no-preference) {
     [data-enhanced='true'] {
       main section:first-of-type {
         min-height: 240vh;
+        @media (max-width: 1024px) {
+          min-height: 180vh;
+        }
+        @media (max-width: 768px) {
+          min-height: 160vh;
+        }
       }
 
       @supports (animation-timeline: scroll()) and (animation-range: 0 100%) {
@@ -240,32 +194,33 @@
             animation-timeline: --runner;
             animation-range: entry 100% exit -20%;
           }
+
+          .hero-figure {
+            animation-name: hero-figure-handoff;
+            animation-fill-mode: both;
+            animation-timing-function: linear;
+            animation-timeline: --runner;
+            animation-range: entry 100% exit -20%;
+            transition: none;
+          }
+
+          .card-cutout {
+            animation-name: hero-cutout-fade, hero-cutout-emerge;
+            animation-fill-mode: both, both;
+            animation-timing-function: linear, var(--power-2-out);
+            animation-timeline: --runner, --runner;
+            animation-range: entry 100% exit -20%, entry 100% exit -20%;
+            transition: none;
+          }
         }
 
         &[data-layers='true'] {
           .grid .layer {
-            -webkit-animation-name: fade, reveal;
-                    animation-name: fade, reveal;
-            -webkit-animation-fill-mode: both;
-                    animation-fill-mode: both;
+            animation-name: fade, reveal;
+            animation-fill-mode: both;
             animation-timeline: --runner, --runner;
-            -webkit-animation-timing-function: var(--sine), var(--power-1-out);
-                    animation-timing-function: var(--sine), var(--power-1-out);
+            animation-timing-function: var(--sine), var(--power-1-out);
             animation-range: entry 100% exit 0%;
-          }
-          &[data-stagger='timing'] .grid .layer {
-            &:nth-of-type(1) {
-              -webkit-animation-timing-function: var(--sine), var(--power-1-out);
-                      animation-timing-function: var(--sine), var(--power-1-out);
-            }
-            &:nth-of-type(2) {
-              -webkit-animation-timing-function: var(--sine), var(--power-3-out);
-                      animation-timing-function: var(--sine), var(--power-3-out);
-            }
-            &:nth-of-type(3) {
-              -webkit-animation-timing-function: var(--sine), var(--power-4-out);
-                      animation-timing-function: var(--sine), var(--power-4-out);
-            }
           }
           &[data-stagger='range'] .grid .layer {
             &:nth-of-type(1) {
@@ -285,7 +240,6 @@
 }
 
 @layer setup {
-  /* gross calculations here to appease Safari and Firefox */
   :root {
     --container-width: 1600px;
     --gap: clamp(10px, 7.35vw, 80px);
@@ -307,33 +261,33 @@
     top: 0;
   }
 
-  /* Full-bleed landing hero. It is pinned to the sticky section viewport (not
-     fixed to the page) so it only covers the screen while this section is in
-     view, leaving the title header above it untouched. The avatar in this
-     scene is pixel-aligned with the cutout in the card beneath, so fading the
-     scene out reads as the desk dissolving around a stationary avatar. */
   .hero-scene {
     position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    -o-object-fit: contain;
-       object-fit: contain;
-    -o-object-position: 50% 50%;
-       object-position: 50% 50%;
+    top: 50%;
+    left: 50%;
+    width: calc(var(--hero-fit, 1) * 100%);
+    height: calc(var(--hero-fit, 1) * 100%);
+    translate: -50% -50%;
+    object-fit: contain;
+    object-position: 50% 50%;
     z-index: 4;
     pointer-events: none;
-    /* Start with the whole landscape visible; the curtain narrows via
-       clip-path on scroll. */
-    clip-path: inset(0% 0% 0% 0% round 0px);
+    clip-path: inset(
+      var(--hero-img-inset-y, 0%) var(--hero-img-inset-x, 0%)
+        var(--hero-img-inset-y, 0%) var(--hero-img-inset-x, 0%) round 16px
+    );
     will-change: clip-path, opacity;
   }
 
-  /* No scroll animation (reduced motion): show the static grid, not the
-     full-bleed scene sitting on top of it. */
   @media (prefers-reduced-motion: reduce) {
     .hero-scene {
       display: none;
+    }
+  }
+
+  @media (orientation: portrait) {
+    .hero-scene {
+      object-fit: cover;
     }
   }
 
@@ -342,14 +296,9 @@
     width: 100%;
     aspect-ratio: 4 / 5;
     position: relative;
-    /* Scale that makes the cell-sized card fill the viewport at the start of
-       the scroll (computed in usePlaybook from the live cell + viewport). */
     --hero-start-scale: 1;
   }
 
-  /* The whole card scales as one unit from --hero-start-scale down to 1 (its
-     grid-cell size), staying centered on the cell via the -50%/-50% translate.
-     Scaling the card as a unit keeps the avatar's framing fixed throughout. */
   .scaler .flip {
     position: absolute;
     top: 50%;
@@ -386,29 +335,23 @@
     position: absolute;
     inset: 0;
     -webkit-backface-visibility: hidden;
-            backface-visibility: hidden;
+    backface-visibility: hidden;
     border-radius: 1rem;
     overflow: hidden;
   }
 
-  /* The gray card matches the scene's backdrop (and the other project cards'
-     footprint). Overflow is hidden so the figure is cropped cleanly to the
-     card frame. */
   .flip-front {
     background: rgb(195 193 193);
+    overflow: visible;
+  }
+
+  .figure-clip {
+    position: absolute;
+    inset: 0;
     overflow: hidden;
-    /* The figure is sized to the viewport and only a portrait slice should
-       show. overflow:hidden does not clip inside the 3D (preserve-3d) flip
-       context, so clip the figure explicitly to the card frame. */
     clip-path: inset(0 round 1rem);
   }
 
-  /* The avatar figure is sized to the *viewport* (not the card) and centered,
-     then cropped by the card. --hero-figure-width is computed in usePlaybook so
-     that, at the card's hero scale, the figure renders at exactly the same size
-     and position as the contained hero scene. That makes the scene-to-card
-     cross-fade pixel-aligned (the avatar never moves), and as the card shrinks
-     the figure shrinks with it straight into the grid cell. */
   .hero-figure {
     position: absolute;
     top: 50%;
@@ -417,19 +360,65 @@
       calc(-50% + var(--hero-figure-dy, 0px));
     width: var(--hero-figure-width, 200%);
     height: auto;
-    /* Opt out of the global `.grid img` cover/4:5 rule so the figure keeps its
-       natural aspect ratio - it is positioned and sized explicitly to overlay
-       the scene's avatar. */
     aspect-ratio: auto;
-    -o-object-fit: fill;
-       object-fit: fill;
+    object-fit: fill;
     border-radius: 0;
     display: block;
     pointer-events: none;
+    transition: opacity 0.24s ease 0.16s;
   }
 
-  /* visibility (not just backface) so the links can't take keyboard focus
-     before the card has settled */
+  [data-settled] .hero-figure {
+    opacity: 0;
+    transition: opacity 0.16s ease;
+  }
+
+  .card-cutout {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: var(--cutout-width, 130%);
+    height: auto;
+    aspect-ratio: auto;
+    object-fit: fill;
+    border-radius: 0;
+    display: block;
+    pointer-events: none;
+    translate: calc(-50% + var(--cutout-aligned-dx, 0px))
+      calc(-50% + var(--cutout-aligned-dy, 0px));
+    transform-origin: 50% 50%;
+    opacity: 0;
+    scale: var(--cutout-swap-scale, 0.6);
+    filter: drop-shadow(0 7px 7px rgb(0 0 0 / 0));
+    transition: opacity 0.2s ease, scale 0.45s ease, translate 0.45s ease,
+      filter 0.25s ease;
+  }
+
+  [data-settled] .card-cutout {
+    opacity: 1;
+    scale: 1;
+    translate: -50% calc(-50% + var(--cutout-popped-dy, 0px));
+    filter: drop-shadow(0 8px 8px rgb(0 0 0 / 0.22));
+    transition: opacity 0.24s ease 0.06s,
+      scale 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.06s,
+      translate 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.06s,
+      filter 0.45s ease 0.2s;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero-figure {
+      display: none;
+    }
+
+    .card-cutout {
+      opacity: 1;
+      scale: 1;
+      translate: -50% calc(-50% + var(--cutout-popped-dy, 0px));
+      filter: drop-shadow(0 8px 8px rgb(0 0 0 / 0.22));
+      transition: none;
+    }
+  }
+
   .flip-back {
     visibility: hidden;
     transform: rotateY(180deg);
@@ -481,7 +470,6 @@
 }
 
 @layer grid {
-  /* it's a 5x3 grid using subgrid, always centered */
   .grid {
     --offset: 0;
     width: 1600px;
@@ -492,14 +480,13 @@
     gap: var(--gap);
     margin: 0 auto;
     align-content: center;
-    /* hmm */
     position: absolute;
     top: 50%;
     left: 50%;
     translate: -50% -50%;
   }
 
-  @media (max-width: 600px) {
+  @media (max-width: 1024px) {
     .grid {
       grid-template-columns: repeat(3, 1fr);
       --offset: -1;
@@ -516,9 +503,6 @@
     grid-row: 1 / -1;
     grid-template-columns: subgrid;
     grid-template-rows: subgrid;
-    /* The three layers all span the full grid and stack — without this the
-       topmost layer's transparent box swallows clicks meant for links in the
-       layers beneath it. */
     pointer-events: none;
   }
 
@@ -555,10 +539,10 @@
   }
 
   .grid img {
+    display: block;
     width: 100%;
     aspect-ratio: 4 / 5;
-    -o-object-fit: cover;
-       object-fit: cover;
+    object-fit: cover;
     border-radius: 1rem;
   }
 }
@@ -569,6 +553,7 @@
   }
   body {
     background: canvasText;
+    display: block;
   }
   h1 {
     --font-level: 8;
@@ -583,11 +568,8 @@
     margin: 0 auto;
     align-content: center;
     max-width: calc(100% - (2 * var(--gutter)));
-    padding-left: 48px;
+    padding-left: clamp(var(--gutter), 4vw, 48px);
     text-align: left;
-  }
-  body {
-    display: block;
   }
 
   main,
@@ -611,10 +593,6 @@
   .content-wrap {
     overflow: clip;
     background: light-dark(#fff, #000);
-    /* position:relative makes the z-index effective so the content-wrap paints
-       OVER the sticky footer during scroll (the footer is only revealed at the
-       very bottom). Without a position the z-index is inert and the positioned
-       footer would sit on top throughout. */
     position: relative;
     z-index: 2;
   }
@@ -624,11 +602,8 @@
     text-align: center;
     position: sticky;
     bottom: 0;
-    background: canvasText;
     color: canvas;
     width: 100%;
-    /* z-index 0 (not -1) so the footer is revealed beneath the content-wrap
-       on scroll but its links stay above the body and remain clickable. */
     z-index: 0;
     background: radial-gradient(hsl(0 0% 0% / 0.1) 2px, #0000 0) 50% 50% / 40px
         40px,
@@ -668,6 +643,18 @@
     width: 100%;
     height: 100%;
     fill: currentColor;
+  }
+
+  @media (max-width: 768px) {
+    header {
+      min-height: 75vh;
+    }
+    section {
+      min-height: 80vh;
+    }
+    footer {
+      padding: 2.5rem 1.5rem;
+    }
   }
 }
 
@@ -745,22 +732,9 @@
       linear-gradient(var(--line) 1px, transparent 1px var(--size)) 50% 50% /
         var(--size) var(--size);
     -webkit-mask: linear-gradient(-20deg, transparent 50%, white);
-            mask: linear-gradient(-20deg, transparent 50%, white);
+    mask: linear-gradient(-20deg, transparent 50%, white);
     top: 0;
     transform-style: flat;
     pointer-events: none;
-  }
-
-  /* Utilities */
-  .sr-only {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border-width: 0;
   }
 }
