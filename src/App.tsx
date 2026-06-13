@@ -1,3 +1,4 @@
+import { SpeedInsights } from '@vercel/speed-insights/react'
 import { avatarCutout, avatarFigure, githubAccounts, heroScene, layers } from './data'
 
 const githubIconPath =
