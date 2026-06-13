@@ -154,9 +154,6 @@
         calc(-50% + var(--cutout-aligned-dy, 0px));
       filter: drop-shadow(0 3px 7px rgb(0 0 0 / 0));
     }
-    96% {
-      scale: 1.03;
-    }
     100% {
       scale: 1;
       translate: -50% calc(-50% + var(--cutout-popped-dy, 0px));
@@ -403,8 +400,8 @@
     translate: -50% calc(-50% + var(--cutout-popped-dy, 0px));
     filter: drop-shadow(0 8px 8px rgb(0 0 0 / 0.22));
     transition: opacity 0.24s ease 0.06s,
-      scale 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) 0.06s,
-      translate 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) 0.06s,
+      scale 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.06s,
+      translate 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.06s,
       filter 0.45s ease 0.2s;
   }
 
