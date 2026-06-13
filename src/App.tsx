@@ -26,7 +26,7 @@ export default function App() {
                 src={heroScene}
                 alt=""
                 aria-hidden="true"
-                decoding="async"
+                decoding="sync"
                 fetchPriority="high"
               />
               <div className="grid">
