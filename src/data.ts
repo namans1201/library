@@ -83,9 +83,9 @@ export const layers: Project[][] = [
   ],
 ]
 
-export const avatarCutout = '/avatar-cutout.png'
+export const avatarCutout = '/avatar-cutout.webp'
 export const heroScene = '/hero-scene.jpg'
-export const avatarFigure = '/avatar-figure.png'
+export const avatarFigure = '/avatar-figure.webp'
 
 export const githubAccounts = [
   { handle: 'Namans12', href: 'https://github.com/Namans12' },
