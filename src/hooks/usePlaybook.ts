@@ -111,6 +111,27 @@ export function usePlaybook() {
       root.style.setProperty('--hero-figure-width', `${(figVisW / startScale).toFixed(2)}px`)
       root.style.setProperty('--hero-figure-dx', `${(dxVisual / startScale).toFixed(2)}px`)
       root.style.setProperty('--hero-figure-dy', `${(dyVisual / startScale).toFixed(2)}px`)
+
+      // The settled cut-out is wider/taller than the card and pokes past its
+      // edges. To make it "emerge from the card", the scroll animation starts
+      // it clipped to the card frame (tucked inside) and then opens the clip so
+      // it rises out. Measure where the card sits inside the cut-out's box (as
+      // fractions of that box, so it's scale-invariant) and expose it to the
+      // keyframes. Robust to whatever width/offset the cut-out is given.
+      const cutout = scaler.querySelector<HTMLElement>('.card-cutout')
+      const cardFace = scaler.querySelector<HTMLElement>('.flip-front')
+      if (cutout && cardFace) {
+        const cr = cutout.getBoundingClientRect()
+        const fr = cardFace.getBoundingClientRect()
+        if (cr.width > 0 && cr.height > 0) {
+          const top = Math.max(0, ((fr.top - cr.top) / cr.height) * 100)
+          const bottom = Math.max(0, ((cr.bottom - fr.bottom) / cr.height) * 100)
+          const side = Math.max(0, ((fr.left - cr.left) / cr.width) * 100)
+          root.style.setProperty('--cutout-inset-top', `${top.toFixed(3)}%`)
+          root.style.setProperty('--cutout-inset-bottom', `${bottom.toFixed(3)}%`)
+          root.style.setProperty('--cutout-inset-x', `${side.toFixed(3)}%`)
+        }
+      }
     }
 
     const hasScrollSupport = CSS.supports(
@@ -129,6 +150,12 @@ export function usePlaybook() {
     }
     updateHeroScale()
     onScroll()
+    // The cut-out's box (and thus the card-inside-cut-out insets) is only
+    // correct once the image has loaded its intrinsic size; recompute then.
+    const cutoutImg = scaler.querySelector<HTMLImageElement>('.card-cutout')
+    if (cutoutImg && !cutoutImg.complete) {
+      cutoutImg.addEventListener('load', updateHeroScale, { once: true })
+    }
     window.addEventListener('scroll', onScroll, { passive: true })
     window.addEventListener('resize', updateHeroScale)
     window.addEventListener('resize', onScroll)
@@ -172,7 +199,7 @@ export function usePlaybook() {
               const s = getComputedStyle(document.documentElement)
               const x = s.getPropertyValue('--hero-img-inset-x').trim() || '0%'
               const y = s.getPropertyValue('--hero-img-inset-y').trim() || '0%'
-              return `inset(${y} ${x} ${y} ${x} round 16px)`
+              return `inset(${y} ${x} ${y} ${x} round 24px)`
             },
           },
           {

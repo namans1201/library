@@ -225,6 +225,115 @@
       opacity: 0;
     }
   }
+  /* Scroll-driven hand-off from the scene-aligned figure to the pop-out
+     cut-out, on the same --runner timeline as the card-shrink, so it plays as
+     you scroll into the settled state - not as a transition afterwards.
+
+     Two stages:
+     1. Hand-off (the crossfade): figure and cut-out opacities are linear
+        mirror images, so they sum to ~1 - no empty-card gap, never two solid
+        avatars at once. Throughout this stage the cut-out is clipped to the
+        card frame, so it looks tucked *inside* the gray card (like the
+        figure) - the swap reads as one image becoming the other.
+     2. The pop: the clip opens from the card frame out to the cut-out's full
+        bounds, so the head and shoulders rise *out* of the card past its
+        edges. The avatar emerges from the card rather than fading in. */
+  /* Near-instant swap, NOT a crossfade and NOT a fade: the figure and cut-out
+     frame the avatar at different sizes, so any opacity overlap ghosts and any
+     fade looks like the avatar "fading in". Instead they swap over ~1% of the
+     scroll, at the settled scale, while BOTH are clipped to the card frame so
+     they look alike - the swap is invisible. The visible motion is the clip
+     opening afterwards (hero-cutout-emerge), which is the avatar rising out of
+     the card. */
+  @-webkit-keyframes hero-figure-handoff {
+    0%,
+    86% {
+      opacity: 1;
+    }
+    87%,
+    100% {
+      opacity: 0;
+    }
+  }
+  @keyframes hero-figure-handoff {
+    0%,
+    86% {
+      opacity: 1;
+    }
+    87%,
+    100% {
+      opacity: 0;
+    }
+  }
+  @-webkit-keyframes hero-cutout-fade {
+    0%,
+    86% {
+      opacity: 0;
+    }
+    87%,
+    100% {
+      opacity: 1;
+    }
+  }
+  @keyframes hero-cutout-fade {
+    0%,
+    86% {
+      opacity: 0;
+    }
+    87%,
+    100% {
+      opacity: 1;
+    }
+  }
+  /* The emerge: clip held at the card frame through the crossfade, then opened
+     out to the cut-out's full bounds (insets computed in usePlaybook). A small
+     scale overshoot from the laptop base adds the spring; the shadow eases in
+     as it lifts off the card. */
+  @-webkit-keyframes hero-cutout-emerge {
+    0%,
+    87% {
+      -webkit-clip-path: inset(
+        var(--cutout-inset-top, 12%) var(--cutout-inset-x, 11%)
+          var(--cutout-inset-bottom, 2%) var(--cutout-inset-x, 11%) round 16px
+      );
+              clip-path: inset(
+        var(--cutout-inset-top, 12%) var(--cutout-inset-x, 11%)
+          var(--cutout-inset-bottom, 2%) var(--cutout-inset-x, 11%) round 16px
+      );
+      scale: 1;
+      -webkit-filter: drop-shadow(0 4px 10px rgb(0 0 0 / 0));
+              filter: drop-shadow(0 4px 10px rgb(0 0 0 / 0));
+    }
+    96% {
+      scale: 1.03;
+    }
+    100% {
+      -webkit-clip-path: inset(0% 0% 0% 0% round 16px);
+              clip-path: inset(0% 0% 0% 0% round 16px);
+      scale: 1;
+      -webkit-filter: drop-shadow(0 8px 16px rgb(0 0 0 / 0.28));
+              filter: drop-shadow(0 8px 16px rgb(0 0 0 / 0.28));
+    }
+  }
+  @keyframes hero-cutout-emerge {
+    0%,
+    89% {
+      clip-path: inset(
+        var(--cutout-inset-top, 12%) var(--cutout-inset-x, 11%)
+          var(--cutout-inset-bottom, 2%) var(--cutout-inset-x, 11%) round 16px
+      );
+      scale: 1;
+      filter: drop-shadow(0 4px 10px rgb(0 0 0 / 0));
+    }
+    96% {
+      scale: 1.03;
+    }
+    100% {
+      clip-path: inset(0% 0% 0% 0% round 16px);
+      scale: 1;
+      filter: drop-shadow(0 8px 16px rgb(0 0 0 / 0.28));
+    }
+  }
   @media (prefers-reduced-motion: no-preference) {
     [data-enhanced='true'] {
       main section:first-of-type {
@@ -251,6 +360,31 @@
             animation-timing-function: var(--power-2-out);
             animation-timeline: --runner;
             animation-range: entry 100% exit -20%;
+          }
+
+          /* Drive the figure -> cut-out hand-off on scroll (overriding the
+             [data-settled] transition, which is the no-scroll-timeline
+             fallback). transition: none stops that fallback transition from
+             fighting these scroll-synced animations. */
+          .hero-figure {
+            animation-name: hero-figure-handoff;
+            animation-fill-mode: both;
+            animation-timing-function: linear;
+            animation-timeline: --runner;
+            animation-range: entry 100% exit -20%;
+            transition: none;
+          }
+
+          .card-cutout {
+            animation-name: hero-cutout-fade, hero-cutout-emerge;
+            animation-fill-mode: both, both;
+            animation-timing-function: linear, var(--power-2-out);
+            animation-timeline: --runner, --runner;
+            animation-range: entry 100% exit -20%, entry 100% exit -20%;
+            /* Anchored (no translate spring) - the emerge is driven by the
+               clip opening + scale-from-base, not by sliding. */
+            translate: -50% 0;
+            transition: none;
           }
         }
 
@@ -456,13 +590,18 @@
     border-radius: 0;
     display: block;
     pointer-events: none;
-    transition: opacity 0.25s ease;
+    /* Return path (un-settling): wait for the cut-out to duck away first,
+       then fade back in - the two images are framed differently, so they
+       must never be on screen together. */
+    transition: opacity 0.24s ease 0.16s;
   }
 
   /* Once the card settles into its grid cell, the scroll-synced figure hands
-     off to the cut-out: the figure fades out and the cut-out pops in. */
+     off to the cut-out: the figure gets out fast (no delay), leaving a beat
+     of clean gray card before the cut-out rises in. */
   [data-settled] .hero-figure {
     opacity: 0;
+    transition: opacity 0.16s ease;
   }
 
   /* The settled card image: avatar + laptop cut out on a transparent
@@ -485,19 +624,33 @@
     border-radius: 0;
     display: block;
     pointer-events: none;
-    translate: -50% 0;
+    /* Hidden state: tucked down into the card and slightly shrunken, with no
+       shadow - it rises and inflates from the laptop base on settle. */
+    translate: -50% 5%;
     /* Pop from the laptop base: the bottom edge stays anchored while the
        avatar springs up past the card's top edge. */
     transform-origin: 50% 100%;
     opacity: 0;
-    scale: 0.85;
-    transition: opacity 0.25s ease,
-      scale 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+    scale: 0.7;
+    filter: drop-shadow(0 6px 12px rgb(0 0 0 / 0));
+    /* Exit path (un-settling): duck back down quickly, no delay, so the gray
+       card is clean before the scroll-synced figure returns. */
+    transition: opacity 0.16s ease, scale 0.22s ease-in,
+      translate 0.22s ease-in, filter 0.16s ease;
   }
 
+  /* Entrance: a short delay lets the figure finish fading (never two avatars
+     double-exposed), then the sticker rises and springs past the card's top
+     edge; a soft silhouette shadow eases in last to lift it off the card. */
   [data-settled] .card-cutout {
     opacity: 1;
     scale: 1;
+    translate: -50% 0;
+    filter: drop-shadow(0 6px 12px rgb(0 0 0 / 0.25));
+    transition: opacity 0.24s ease 0.12s,
+      scale 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.12s,
+      translate 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.12s,
+      filter 0.45s ease 0.3s;
   }
 
   /* Reduced motion: there is no scroll morph, so skip the scroll-synced
@@ -510,6 +663,8 @@
     .card-cutout {
       opacity: 1;
       scale: 1;
+      translate: -50% 0;
+      filter: drop-shadow(0 6px 12px rgb(0 0 0 / 0.25));
       transition: none;
     }
   }
