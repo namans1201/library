@@ -308,8 +308,8 @@
     100% {
       scale: 1;
       translate: -50% calc(-50% + var(--cutout-popped-dy, 0px));
-      -webkit-filter: drop-shadow(0 6px 11px rgb(0 0 0 / 0.28));
-              filter: drop-shadow(0 6px 11px rgb(0 0 0 / 0.28));
+      -webkit-filter: drop-shadow(0 8px 8px rgb(0 0 0 / 0.22));
+              filter: drop-shadow(0 8px 8px rgb(0 0 0 / 0.22));
     }
   }
   @keyframes hero-cutout-emerge {
@@ -326,7 +326,7 @@
     100% {
       scale: 1;
       translate: -50% calc(-50% + var(--cutout-popped-dy, 0px));
-      filter: drop-shadow(0 6px 11px rgb(0 0 0 / 0.28));
+      filter: drop-shadow(0 8px 8px rgb(0 0 0 / 0.22));
     }
   }
   @media (prefers-reduced-motion: no-preference) {
@@ -619,27 +619,35 @@
     border-radius: 0;
     display: block;
     pointer-events: none;
-    /* Popped placement: bottom-anchored a constant fraction of the card,
-       centred horizontally. Scales about its own centre. */
-    translate: -50% calc(-50% + var(--cutout-popped-dy, 0px));
+    /* Hidden/aligned state: overlays the figure exactly (same as the scroll
+       path's swap frame), so the figure→cut-out hand-off is in sync in EVERY
+       browser - including the no-scroll-timeline fallback, which animates from
+       here to the popped state below. Scales about its own centre. */
+    translate: calc(-50% + var(--cutout-aligned-dx, 0px))
+      calc(-50% + var(--cutout-aligned-dy, 0px));
     transform-origin: 50% 50%;
     opacity: 0;
-    scale: 0.92;
-    filter: drop-shadow(0 6px 12px rgb(0 0 0 / 0));
-    /* Fallback (no scroll-timeline) entrance/exit pop. */
-    transition: opacity 0.18s ease, scale 0.3s ease, filter 0.2s ease;
+    scale: var(--cutout-swap-scale, 0.6);
+    /* Grounded shadow: short offset + tight blur so the spiky hair doesn't
+       blur into a faint halo above the head (which read as a ghost). */
+    filter: drop-shadow(0 7px 7px rgb(0 0 0 / 0));
+    /* Fallback (no scroll-timeline) entrance/exit: aligned -> popped. */
+    transition: opacity 0.2s ease, scale 0.45s ease, translate 0.45s ease,
+      filter 0.25s ease;
   }
 
-  /* Fallback entrance: once settled, the cut-out pops in (grown to its popped
-     size) and a soft silhouette shadow lifts it off the card. (The
-     scroll-timeline path overrides this with the grow-out emerge.) */
+  /* Fallback entrance: once settled, the cut-out grows from the figure-aligned
+     position into its popped size and a grounded shadow lifts it off the card.
+     (The scroll-timeline path overrides this with the grow-out emerge.) */
   [data-settled] .card-cutout {
     opacity: 1;
     scale: 1;
-    filter: drop-shadow(0 6px 12px rgb(0 0 0 / 0.25));
-    transition: opacity 0.24s ease 0.1s,
-      scale 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) 0.1s,
-      filter 0.45s ease 0.25s;
+    translate: -50% calc(-50% + var(--cutout-popped-dy, 0px));
+    filter: drop-shadow(0 8px 8px rgb(0 0 0 / 0.22));
+    transition: opacity 0.24s ease 0.06s,
+      scale 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) 0.06s,
+      translate 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) 0.06s,
+      filter 0.45s ease 0.2s;
   }
 
   /* Reduced motion: there is no scroll morph, so skip the scroll-synced
@@ -652,7 +660,8 @@
     .card-cutout {
       opacity: 1;
       scale: 1;
-      filter: drop-shadow(0 6px 12px rgb(0 0 0 / 0.25));
+      translate: -50% calc(-50% + var(--cutout-popped-dy, 0px));
+      filter: drop-shadow(0 8px 8px rgb(0 0 0 / 0.22));
       transition: none;
     }
   }
