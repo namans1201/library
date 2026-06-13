@@ -45,20 +45,28 @@ export function usePlaybook() {
 
       const vw = window.innerWidth
       const vh = window.innerHeight
-      const sceneScale = Math.min(sceneBoxWidth / HERO.w, sceneBoxHeight / HERO.h)
+      const isCover = window.innerWidth <= window.innerHeight
+      const sceneScale = isCover
+        ? Math.max(sceneBoxWidth / HERO.w, sceneBoxHeight / HERO.h)
+        : Math.min(sceneBoxWidth / HERO.w, sceneBoxHeight / HERO.h)
       const sceneW = HERO.w * sceneScale
       const sceneH = HERO.h * sceneScale
       const letterboxX = (vw - sceneW) / 2
       const letterboxY = (vh - sceneH) / 2
 
-      root.style.setProperty(
-        '--hero-img-inset-x',
-        `${(((sceneBoxWidth - sceneW) / 2 / sceneBoxWidth) * 100).toFixed(3)}%`
-      )
-      root.style.setProperty(
-        '--hero-img-inset-y',
-        `${(((sceneBoxHeight - sceneH) / 2 / sceneBoxHeight) * 100).toFixed(3)}%`
-      )
+      if (isCover) {
+        root.style.setProperty('--hero-img-inset-x', '0%')
+        root.style.setProperty('--hero-img-inset-y', '0%')
+      } else {
+        root.style.setProperty(
+          '--hero-img-inset-x',
+          `${(((sceneBoxWidth - sceneW) / 2 / sceneBoxWidth) * 100).toFixed(3)}%`
+        )
+        root.style.setProperty(
+          '--hero-img-inset-y',
+          `${(((sceneBoxHeight - sceneH) / 2 / sceneBoxHeight) * 100).toFixed(3)}%`
+        )
+      }
 
       const figVisW = FIG.w * FIG2SCENE.scale * sceneScale
       const figCenterX =
