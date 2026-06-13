@@ -10,6 +10,9 @@
        this same factor (here and in usePlaybook), so the scene→card morph
        stays pixel-aligned — it just plays out a little smaller. */
     --hero-fit: 0.9;
+    /* Popped cut-out width as a fraction of the card (constant at every
+       viewport). 1 = exactly card width; >1 pops out past the edges. */
+    --cutout-pop: 1.3;
     --power-1-out: linear(
       0 0%,
       0.0027 3.64%,
@@ -285,53 +288,45 @@
       opacity: 1;
     }
   }
-  /* The emerge: clip held at the card frame through the crossfade, then opened
-     out to the cut-out's full bounds (insets computed in usePlaybook). A small
-     scale overshoot from the laptop base adds the spring; the shadow eases in
-     as it lifts off the card. */
+  /* The emerge: at the swap the cut-out exactly overlays the figure (scale 1,
+     tucked inside the card). It then grows about its centre to --cutout-pop
+     so the avatar pops out past the card's edges - head above the top, laptop
+     down to the bottom - with a small overshoot and a shadow that lifts it off
+     the card. Growing from the aligned size is what keeps the swap seamless. */
   @-webkit-keyframes hero-cutout-emerge {
     0%,
     87% {
-      -webkit-clip-path: inset(
-        var(--cutout-inset-top, 12%) var(--cutout-inset-x, 11%)
-          var(--cutout-inset-bottom, 2%) var(--cutout-inset-x, 11%) round 16px
-      );
-              clip-path: inset(
-        var(--cutout-inset-top, 12%) var(--cutout-inset-x, 11%)
-          var(--cutout-inset-bottom, 2%) var(--cutout-inset-x, 11%) round 16px
-      );
-      scale: 1;
-      -webkit-filter: drop-shadow(0 4px 10px rgb(0 0 0 / 0));
-              filter: drop-shadow(0 4px 10px rgb(0 0 0 / 0));
+      scale: var(--cutout-swap-scale, 0.6);
+      translate: calc(-50% + var(--cutout-aligned-dx, 0px))
+        calc(-50% + var(--cutout-aligned-dy, 0px));
+      -webkit-filter: drop-shadow(0 3px 7px rgb(0 0 0 / 0));
+              filter: drop-shadow(0 3px 7px rgb(0 0 0 / 0));
     }
     96% {
       scale: 1.03;
     }
     100% {
-      -webkit-clip-path: inset(0% 0% 0% 0% round 16px);
-              clip-path: inset(0% 0% 0% 0% round 16px);
       scale: 1;
-      -webkit-filter: drop-shadow(0 8px 16px rgb(0 0 0 / 0.28));
-              filter: drop-shadow(0 8px 16px rgb(0 0 0 / 0.28));
+      translate: -50% calc(-50% + var(--cutout-popped-dy, 0px));
+      -webkit-filter: drop-shadow(0 6px 11px rgb(0 0 0 / 0.28));
+              filter: drop-shadow(0 6px 11px rgb(0 0 0 / 0.28));
     }
   }
   @keyframes hero-cutout-emerge {
     0%,
-    89% {
-      clip-path: inset(
-        var(--cutout-inset-top, 12%) var(--cutout-inset-x, 11%)
-          var(--cutout-inset-bottom, 2%) var(--cutout-inset-x, 11%) round 16px
-      );
-      scale: 1;
-      filter: drop-shadow(0 4px 10px rgb(0 0 0 / 0));
+    87% {
+      scale: var(--cutout-swap-scale, 0.6);
+      translate: calc(-50% + var(--cutout-aligned-dx, 0px))
+        calc(-50% + var(--cutout-aligned-dy, 0px));
+      filter: drop-shadow(0 3px 7px rgb(0 0 0 / 0));
     }
     96% {
       scale: 1.03;
     }
     100% {
-      clip-path: inset(0% 0% 0% 0% round 16px);
       scale: 1;
-      filter: drop-shadow(0 8px 16px rgb(0 0 0 / 0.28));
+      translate: -50% calc(-50% + var(--cutout-popped-dy, 0px));
+      filter: drop-shadow(0 6px 11px rgb(0 0 0 / 0.28));
     }
   }
   @media (prefers-reduced-motion: no-preference) {
@@ -381,9 +376,8 @@
             animation-timing-function: linear, var(--power-2-out);
             animation-timeline: --runner, --runner;
             animation-range: entry 100% exit -20%, entry 100% exit -20%;
-            /* Anchored (no translate spring) - the emerge is driven by the
-               clip opening + scale-from-base, not by sliding. */
-            translate: -50% 0;
+            /* scale + translate are driven by the emerge keyframes (aligned ->
+               popped); kill the fallback transition so it can't fight them. */
             transition: none;
           }
         }
@@ -605,16 +599,17 @@
   }
 
   /* The settled card image: avatar + laptop cut out on a transparent
-     background, anchored near the card's bottom edge and sized a touch wider
-     than the card so the sticker pops out past the card's top and side edges
-     - the full image stays visible, never cropped (the front face no longer
-     clips). Hidden while the scroll-synced figure drives the morph. */
+     background. Its width and centre offset (--cutout-*) are computed in
+     usePlaybook so the cut-out's avatar lands exactly over the scroll-synced
+     figure's avatar at the hand-off (FIG2CUT, template-matched) - the swap
+     stays in sync. The cut-out's framing is fuller than the card, so it pokes
+     past the edges; the front face no longer clips, so it's never cropped.
+     Hidden while the scroll-synced figure drives the morph. */
   .card-cutout {
     position: absolute;
+    top: 50%;
     left: 50%;
-    /* Laptop base sits exactly on the card's bottom border. */
-    bottom: -2%;
-    width: 130%;
+    width: var(--cutout-width, 130%);
     height: auto;
     /* Opt out of the global `.grid img` cover/4:5 rule - the cut-out keeps
        its natural aspect ratio. */
@@ -624,33 +619,27 @@
     border-radius: 0;
     display: block;
     pointer-events: none;
-    /* Hidden state: tucked down into the card and slightly shrunken, with no
-       shadow - it rises and inflates from the laptop base on settle. */
-    translate: -50% 5%;
-    /* Pop from the laptop base: the bottom edge stays anchored while the
-       avatar springs up past the card's top edge. */
-    transform-origin: 50% 100%;
+    /* Popped placement: bottom-anchored a constant fraction of the card,
+       centred horizontally. Scales about its own centre. */
+    translate: -50% calc(-50% + var(--cutout-popped-dy, 0px));
+    transform-origin: 50% 50%;
     opacity: 0;
-    scale: 0.7;
+    scale: 0.92;
     filter: drop-shadow(0 6px 12px rgb(0 0 0 / 0));
-    /* Exit path (un-settling): duck back down quickly, no delay, so the gray
-       card is clean before the scroll-synced figure returns. */
-    transition: opacity 0.16s ease, scale 0.22s ease-in,
-      translate 0.22s ease-in, filter 0.16s ease;
+    /* Fallback (no scroll-timeline) entrance/exit pop. */
+    transition: opacity 0.18s ease, scale 0.3s ease, filter 0.2s ease;
   }
 
-  /* Entrance: a short delay lets the figure finish fading (never two avatars
-     double-exposed), then the sticker rises and springs past the card's top
-     edge; a soft silhouette shadow eases in last to lift it off the card. */
+  /* Fallback entrance: once settled, the cut-out pops in (grown to its popped
+     size) and a soft silhouette shadow lifts it off the card. (The
+     scroll-timeline path overrides this with the grow-out emerge.) */
   [data-settled] .card-cutout {
     opacity: 1;
     scale: 1;
-    translate: -50% 0;
     filter: drop-shadow(0 6px 12px rgb(0 0 0 / 0.25));
-    transition: opacity 0.24s ease 0.12s,
-      scale 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.12s,
-      translate 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.12s,
-      filter 0.45s ease 0.3s;
+    transition: opacity 0.24s ease 0.1s,
+      scale 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) 0.1s,
+      filter 0.45s ease 0.25s;
   }
 
   /* Reduced motion: there is no scroll morph, so skip the scroll-synced
@@ -663,7 +652,6 @@
     .card-cutout {
       opacity: 1;
       scale: 1;
-      translate: -50% 0;
       filter: drop-shadow(0 6px 12px rgb(0 0 0 / 0.25));
       transition: none;
     }

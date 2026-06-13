@@ -112,26 +112,39 @@ export function usePlaybook() {
       root.style.setProperty('--hero-figure-dx', `${(dxVisual / startScale).toFixed(2)}px`)
       root.style.setProperty('--hero-figure-dy', `${(dyVisual / startScale).toFixed(2)}px`)
 
-      // The settled cut-out is wider/taller than the card and pokes past its
-      // edges. To make it "emerge from the card", the scroll animation starts
-      // it clipped to the card frame (tucked inside) and then opens the clip so
-      // it rises out. Measure where the card sits inside the cut-out's box (as
-      // fractions of that box, so it's scale-invariant) and expose it to the
-      // keyframes. Robust to whatever width/offset the cut-out is given.
-      const cutout = scaler.querySelector<HTMLElement>('.card-cutout')
-      const cardFace = scaler.querySelector<HTMLElement>('.flip-front')
-      if (cutout && cardFace) {
-        const cr = cutout.getBoundingClientRect()
-        const fr = cardFace.getBoundingClientRect()
-        if (cr.width > 0 && cr.height > 0) {
-          const top = Math.max(0, ((fr.top - cr.top) / cr.height) * 100)
-          const bottom = Math.max(0, ((cr.bottom - fr.bottom) / cr.height) * 100)
-          const side = Math.max(0, ((fr.left - cr.left) / cr.width) * 100)
-          root.style.setProperty('--cutout-inset-top', `${top.toFixed(3)}%`)
-          root.style.setProperty('--cutout-inset-bottom', `${bottom.toFixed(3)}%`)
-          root.style.setProperty('--cutout-inset-x', `${side.toFixed(3)}%`)
-        }
-      }
+      // Two placements for the cut-out, both in the card's cell coordinates:
+      //  - ALIGNED: overlays the scroll-synced figure exactly (FIG2CUT,
+      //    template-matched against the actual pixels) so the figure→cut-out
+      //    swap is seamless - no jump in face position or size.
+      //  - POPPED: a fixed fraction of the card (--cutout-pop), bottom-anchored,
+      //    so the avatar + laptop pop out the same amount at every viewport.
+      // The emerge tweens scale + offset from ALIGNED to POPPED: it swaps in
+      // synced, then grows into its popped size. Because the layout size IS the
+      // popped size, the drop-shadow renders at scale ~1 (no blown-up halo).
+      const CUT = { w: 1047, h: 1173 }
+      const FIG2CUT = { scale: 1.1462, ox: -322.6, oy: 115.2 }
+      const kFig = figVisW / FIG.w
+      const kCut = kFig / FIG2CUT.scale
+      const alignedW = (CUT.w * kCut) / startScale
+      const alignedDx =
+        (dxVisual - (FIG.w / 2) * kFig - (FIG2CUT.ox - CUT.w / 2) * kCut) /
+        startScale
+      const alignedDy =
+        (dyVisual - (FIG.h / 2) * kFig - (FIG2CUT.oy - CUT.h / 2) * kCut) /
+        startScale
+
+      const popRatio =
+        Number.parseFloat(styles.getPropertyValue('--cutout-pop')) || 1.3
+      const poppedW = popRatio * width
+      const poppedH = (poppedW * CUT.h) / CUT.w
+      // Bottom edge 2% below the card's bottom -> the head pops above the top.
+      const poppedDy = 1.02 * height - poppedH / 2 - height / 2
+
+      root.style.setProperty('--cutout-width', `${poppedW.toFixed(2)}px`)
+      root.style.setProperty('--cutout-popped-dy', `${poppedDy.toFixed(2)}px`)
+      root.style.setProperty('--cutout-aligned-dx', `${alignedDx.toFixed(2)}px`)
+      root.style.setProperty('--cutout-aligned-dy', `${alignedDy.toFixed(2)}px`)
+      root.style.setProperty('--cutout-swap-scale', (alignedW / poppedW).toFixed(4))
     }
 
     const hasScrollSupport = CSS.supports(
