@@ -98,6 +98,21 @@
     }
   }
 
+  /* Fade the light card face in as the card finishes shrinking — slightly
+     before the final settle — so the card reads as "landed" a touch early.
+     Starts late enough (~86%) that the face is already near its final size,
+     avoiding the full-screen gray flash. */
+  @keyframes card-face-fade {
+    0%,
+    86% {
+      background-color: transparent;
+    }
+    93%,
+    100% {
+      background-color: rgb(195 193 193);
+    }
+  }
+
   @keyframes hero-scene-narrow {
     0%,
     5% {
@@ -195,6 +210,14 @@
             animation-name: hero-scene-narrow;
             animation-fill-mode: both;
             animation-timing-function: var(--power-2-out);
+            animation-timeline: --runner;
+            animation-range: entry 100% exit -20%;
+          }
+
+          .flip-front {
+            animation-name: card-face-fade;
+            animation-fill-mode: both;
+            animation-timing-function: linear;
             animation-timeline: --runner;
             animation-range: entry 100% exit -20%;
           }
