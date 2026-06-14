@@ -544,6 +544,15 @@
   .grid .layer a {
     display: block;
     pointer-events: auto;
+    border-radius: 1rem;
+    transition: transform 0.22s ease, box-shadow 0.22s ease;
+  }
+
+  .grid .layer a:hover {
+    transform: translateY(-3px) scale(1.025);
+    box-shadow:
+      0 0 0 1.5px light-dark(rgb(0 0 0 / 0.08), rgb(255 255 255 / 0.12)),
+      0 8px 28px light-dark(rgb(0 0 0 / 0.14), rgb(255 255 255 / 0.07));
   }
 
   .grid > div:nth-of-type(1) div:nth-of-type(odd) {
