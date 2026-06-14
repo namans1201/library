@@ -83,7 +83,7 @@ export const layers: Project[][] = [
   ],
 ]
 
-export const avatarCutout = '/avatar-cutout.webp'
+export const avatarCutout = '/avatar-figure.webp'
 export const heroScene = '/hero-scene.jpg'
 export const avatarFigure = '/avatar-figure.webp'
 

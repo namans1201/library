@@ -80,29 +80,39 @@ export function usePlaybook() {
       root.style.setProperty('--hero-figure-dx', `${(dxVisual / startScale).toFixed(2)}px`)
       root.style.setProperty('--hero-figure-dy', `${(dyVisual / startScale).toFixed(2)}px`)
 
-      const CUT = { w: 1047, h: 1173 }
-      const FIG2CUT = { scale: 1.1462, ox: -322.6, oy: 115.2 }
-      const kFig = figVisW / FIG.w
-      const kCut = kFig / FIG2CUT.scale
-      const alignedW = (CUT.w * kCut) / startScale
-      const alignedDx =
-        (dxVisual - (FIG.w / 2) * kFig - (FIG2CUT.ox - CUT.w / 2) * kCut) /
-        startScale
-      const alignedDy =
-        (dyVisual - (FIG.h / 2) * kFig - (FIG2CUT.oy - CUT.h / 2) * kCut) /
-        startScale
+      // The popout reuses the SAME figure image, so its aligned state mirrors
+      // the hero figure exactly — the handoff is a pixel-identical crossfade
+      // (perfectly synced, no swap), and from there it just pops to the settled
+      // size. Aspect comes from the live image so the box matches the artwork.
+      const cutoutEl = scaler.querySelector<HTMLImageElement>('.card-cutout')
+      const figAspect =
+        cutoutEl && cutoutEl.naturalWidth
+          ? cutoutEl.naturalHeight / cutoutEl.naturalWidth
+          : FIG.h / FIG.w
 
       const popRatio =
         Number.parseFloat(styles.getPropertyValue('--cutout-pop')) || 1.3
+      // Vertical anchor for the settled popout: fraction of the card height at
+      // which the figure's bottom rests. >1 nudges it below the lower edge so
+      // it sits flush with the layout card's lower boundary.
+      const popAnchor =
+        Number.parseFloat(styles.getPropertyValue('--cutout-anchor')) || 1.1
       const poppedW = popRatio * width
-      const poppedH = (poppedW * CUT.h) / CUT.w
-      const poppedDy = 1.02 * height - poppedH / 2 - height / 2
+      const poppedH = poppedW * figAspect
+      const poppedDy = popAnchor * height - poppedH / 2 - height / 2
+
+      const heroFigureWidth = figVisW / startScale
+      const alignedDx = dxVisual / startScale
+      const alignedDy = dyVisual / startScale
 
       root.style.setProperty('--cutout-width', `${poppedW.toFixed(2)}px`)
       root.style.setProperty('--cutout-popped-dy', `${poppedDy.toFixed(2)}px`)
       root.style.setProperty('--cutout-aligned-dx', `${alignedDx.toFixed(2)}px`)
       root.style.setProperty('--cutout-aligned-dy', `${alignedDy.toFixed(2)}px`)
-      root.style.setProperty('--cutout-swap-scale', (alignedW / poppedW).toFixed(4))
+      root.style.setProperty(
+        '--cutout-swap-scale',
+        (heroFigureWidth / poppedW).toFixed(4)
+      )
     }
 
     const hasScrollSupport = CSS.supports(

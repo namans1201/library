@@ -5,7 +5,8 @@
 @layer scroll {
   :root {
     --hero-fit: 0.9;
-    --cutout-pop: 1.3;
+    --cutout-pop: 2.15;
+    --cutout-anchor: 1.18;
     --power-1-out: linear(
       0 0%,
       0.0027 3.64%,
@@ -124,12 +125,15 @@
     }
   }
 
+  /* Hand the clipped hero figure over to the unclipped popout right as the
+     hero photo fades out (~62%). Otherwise the card-clipped figure (cut arms)
+     stays visible in the gap between the photo fading and the later pop. */
   @keyframes hero-figure-handoff {
     0%,
-    86% {
+    52% {
       opacity: 1;
     }
-    87%,
+    62%,
     100% {
       opacity: 0;
     }
@@ -137,10 +141,10 @@
 
   @keyframes hero-cutout-fade {
     0%,
-    86% {
+    52% {
       opacity: 0;
     }
-    87%,
+    62%,
     100% {
       opacity: 1;
     }
@@ -341,8 +345,16 @@
   }
 
   .flip-front {
-    background: rgb(195 193 193);
+    background: transparent;
     overflow: visible;
+    transition: background-color 0.3s ease;
+  }
+
+  /* Only paint the light card face once the card has settled at its final
+     size — otherwise it balloons to full-screen scale as the hero photo
+     fades out and reads as a white flash. */
+  [data-settled] .flip-front {
+    background: rgb(195 193 193);
   }
 
   .figure-clip {
