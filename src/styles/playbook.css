@@ -5,8 +5,8 @@
 @layer scroll {
   :root {
     --hero-fit: 0.9;
-    --cutout-pop: 2.15;
-    --cutout-anchor: 1.18;
+    --cutout-pop: 2.30;
+    --cutout-anchor: 1.16;
     --power-1-out: linear(
       0 0%,
       0.0027 3.64%,
