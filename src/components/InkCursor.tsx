@@ -42,8 +42,9 @@ const fragment = /* glsl */ `
   varying vec2 vUv;
 
   void main() {
-    // Head (vUv.y = 0) opaque → tail (vUv.y = 1) transparent
-    float alpha  = pow(1.0 - vUv.y, 1.3) * 0.88;
+    // Head (vUv.y = 0) nearly opaque → tail fades sharply to transparent.
+    // Higher exponent = faster fade = brighter, crisper head in both themes.
+    float alpha  = pow(1.0 - vUv.y, 1.8) * 0.96;
     gl_FragColor = vec4(uColor, alpha);
   }
 `
@@ -53,12 +54,13 @@ const fragment = /* glsl */ `
 const HOT_X = 0   // 16px image hotspot x
 const HOT_Y = 1   // 16px image hotspot y
 
+// Read dark mode from the actual computed background color — same signal CSS
+// light-dark() uses, so it always matches regardless of browser overrides.
 function isDarkMode(): boolean {
   const theme = document.documentElement.getAttribute('data-theme')
-  return (
-    theme === 'dark' ||
-    (!theme && matchMedia('(prefers-color-scheme: dark)').matches)
-  )
+  if (theme === 'light') return false
+  if (theme === 'dark') return true
+  return matchMedia('(prefers-color-scheme: dark)').matches
 }
 
 function loadImg(src: string): Promise<HTMLImageElement> {
@@ -163,12 +165,13 @@ export default function InkCursor() {
     const scene  = new Transform()
     const points: Vec3[] = Array.from({ length: POINT_COUNT }, () => new Vec3(-2, -2, 0))
 
-    const inkColor = new Color('#000000')
+    const INK_LIGHT = new Color('#000000')   // black trail on light bg
+    const INK_DARK  = new Color('#ffffff')   // white trail on dark  bg
     const polyline = new Polyline(gl, {
       points,
       vertex,
       fragment,
-      uniforms: { uColor: { value: inkColor } },
+      uniforms: { uColor: { value: INK_LIGHT } },
     })
     polyline.mesh.setParent(scene)
     polyline.mesh.visible = false   // hidden until first mouse entry
@@ -204,10 +207,7 @@ export default function InkCursor() {
     const loop = () => {
       animId = requestAnimationFrame(loop)
 
-      const dark = isDarkMode()
-      inkColor[0] = dark ? 1 : 0
-      inkColor[1] = dark ? 1 : 0
-      inkColor[2] = dark ? 1 : 0
+      polyline.mesh.program.uniforms['uColor'].value = isDarkMode() ? INK_DARK : INK_LIGHT
 
       for (let i = points.length - 1; i >= 0; i--) {
         if (i === 0) {
