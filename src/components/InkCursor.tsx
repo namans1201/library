@@ -176,7 +176,6 @@ export default function InkCursor() {
     const mouse    = new Vec3(-2, -2, 0)
     const velocity = new Vec3()
     const tmp      = new Vec3()
-    let prevX = -200, prevY = -200
     let entered = false
 
     const onMove = (e: MouseEvent) => {
@@ -192,8 +191,6 @@ export default function InkCursor() {
       }
 
       mouse.set(ndcX, ndcY, 0)
-      prevX = e.clientX
-      prevY = e.clientY
     }
 
     window.addEventListener('mousemove', onMove)
