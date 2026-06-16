@@ -42,11 +42,12 @@ export default function App() {
                           aria-label={`${project.name} on GitHub`}
                         >
                           <img
-                          src={project.src}
-                          alt={project.name}
-                          loading="lazy"
-                          decoding="async"
-                        />
+                            src={project.src}
+                            alt={project.name}
+                            loading="lazy"
+                            decoding="async"
+                          />
+                          <span className="card-caption">{project.name}</span>
                         </a>
                       </div>
                     ))}
