@@ -27,9 +27,9 @@ export const layers: Project[][] = [
       name: 'projects-web',
     },
     {
-      src: '/images/water-logger.jpg',
-      href: 'https://github.com/Namans12/water-logger',
-      name: 'water-logger',
+      src: '/images/nourishcue.jpg',
+      href: 'https://github.com/Namans12/nourishcue',
+      name: 'nourishcue',
     },
     {
       src: '/images/scraper-downloader-raretoons.jpg',
