@@ -27,9 +27,9 @@ export const layers: Project[][] = [
       name: 'projects-web',
     },
     {
-      src: '/images/nourishcue.jpg',
-      href: 'https://github.com/Namans12/nourishcue',
-      name: 'nourishcue',
+      src: '/images/musicpipeline--best.jpg',
+      href: 'https://github.com/Namans12/musicpipeline--best',
+      name: 'musicpipeline--best',
     },
     {
       src: '/images/scraper-downloader-raretoons.jpg',
@@ -39,9 +39,9 @@ export const layers: Project[][] = [
   ],
   [
     {
-      src: '/images/musicpipeline--best.jpg',
-      href: 'https://github.com/Namans12/musicpipeline--best',
-      name: 'musicpipeline--best',
+      src: '/images/nourishcue.jpg',
+      href: 'https://github.com/Namans12/nourishcue',
+      name: 'nourishcue',
     },
     {
       src: '/images/videolyzer-dashboard.jpg',
